@@ -180,9 +180,9 @@ export default {
 
   created() {
     this.synth = new Tone.Synth().toDestination();
+    this.swaralipi = new SwaralipiCore(this.scale, this.middleOctave, this.lang)
     this.generateNotes();
     this.generateNotesIndexesByKey();
-    this.swaralipi = new SwaralipiCore(this.scale, this.middleOctave, this.lang)
 
     window.addEventListener("keydown", e => {
       const key = e.key;
