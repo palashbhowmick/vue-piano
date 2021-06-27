@@ -4201,12 +4201,20 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0a498af2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/PianoKeyboard.vue?vue&type=template&id=ae94e940&
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"piano-keyboard"},_vm._l((_vm.notes),function(noteObject){return _c('div',{key:noteObject.note,staticClass:"white-note",class:[noteObject.pressed ? 'white-note-pressed' : ''],style:({width: _vm.whiteNoteWidthSize + '%', background: _vm.whiteNoteBackground(noteObject.pressed)}),on:{"mousedown":function($event){return _vm.playNoteMouse(noteObject)},"mouseup":function($event){return _vm.removePressedKeyMouse(noteObject)},"mouseover":function($event){return _vm.playNoteHover(noteObject)},"mouseleave":function($event){return _vm.removePressedKey(noteObject)}}},[(noteObject.blackNote)?_c('div',{staticClass:"black-note",class:[noteObject.blackNote.pressed ? 'black-note-pressed' : ''],style:({background: _vm.blackNoteBackground(noteObject.blackNote.pressed)}),on:{"mousedown":function($event){$event.stopPropagation();return _vm.playNoteMouse(noteObject.blackNote)},"mouseup":function($event){$event.stopPropagation();return _vm.removePressedKeyMouse(noteObject.blackNote)},"mouseover":function($event){$event.stopPropagation();return _vm.playNoteHover(noteObject.blackNote)},"mouseleave":function($event){$event.stopPropagation();return _vm.removePressedKey(noteObject.blackNote)}}},[_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.blackNote.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{class:['key-text','key-text-on-black-note',_vm.indianNotes?'':'key-text-vertical']},[_vm._v(" "+_vm._s(noteObject.blackNote.label)+" ")]):_vm._e()])]):_vm._e(),_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{staticClass:"key-text"},[_vm._v(" "+_vm._s(noteObject.label)+" ")]):_vm._e()])])}),0)}
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0a498af2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/PianoKeyboard.vue?vue&type=template&id=4c478735&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"piano-keyboard"},_vm._l((_vm.notes),function(noteObject){return _c('div',{key:noteObject.note,staticClass:"white-note",class:[noteObject.pressed ? 'white-note-pressed' : ''],style:({
+      width: _vm.whiteNoteWidthSize + '%',
+      background: _vm.whiteNoteBackground(noteObject.pressed),
+    }),on:{"mousedown":function($event){return _vm.playNoteMouse(noteObject)},"mouseup":function($event){return _vm.removePressedKeyMouse(noteObject)},"mouseover":function($event){return _vm.playNoteHover(noteObject)},"mouseleave":function($event){return _vm.removePressedKey(noteObject)}}},[(noteObject.blackNote)?_c('div',{staticClass:"black-note",class:[noteObject.blackNote.pressed ? 'black-note-pressed' : ''],style:({
+        background: _vm.blackNoteBackground(noteObject.blackNote.pressed),
+      }),on:{"mousedown":function($event){$event.stopPropagation();return _vm.playNoteMouse(noteObject.blackNote)},"mouseup":function($event){$event.stopPropagation();return _vm.removePressedKeyMouse(noteObject.blackNote)},"mouseover":function($event){$event.stopPropagation();return _vm.playNoteHover(noteObject.blackNote)},"mouseleave":function($event){$event.stopPropagation();return _vm.removePressedKey(noteObject.blackNote)}}},[_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.blackNote.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{class:[
+            'key-text',
+            'key-text-on-black-note',
+            _vm.indianNotes ? '' : 'key-text-vertical' ]},[_vm._v(" "+_vm._s(noteObject.blackNote.label)+" ")]):_vm._e()])]):_vm._e(),_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{staticClass:"key-text"},[_vm._v(" "+_vm._s(noteObject.label)+" ")]):_vm._e()])])}),0)}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/components/PianoKeyboard.vue?vue&type=template&id=ae94e940&
+// CONCATENATED MODULE: ./src/components/PianoKeyboard.vue?vue&type=template&id=4c478735&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.for-each.js
 var es_array_for_each = __webpack_require__("4160");
@@ -35744,6 +35752,25 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ var PianoKeyboardvue_type_script_lang_js_ = ({
@@ -35756,23 +35783,23 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
       notesIndexesByKey: {},
 
       /* Array with generated notes of the form 
-          { 
-              note: <C4>,
-              key: <a>,
-              pressed: <false>,
-              blackNote: { 
-                  name: <C#4>,
-                  key: <b>,
-                  pressed: <false> 
-              } 
-          }
-          where note is the note name, key is a keyboard key you have to press in order to play that note,
-          pressed is telling us if note is pressed or not and blackNote is mandatory only for notes that have 'sharp/flat'
-      */
+            { 
+                note: <C4>,
+                key: <a>,
+                pressed: <false>,
+                blackNote: { 
+                    name: <C#4>,
+                    key: <b>,
+                    pressed: <false> 
+                } 
+            }
+            where note is the note name, key is a keyboard key you have to press in order to play that note,
+            pressed is telling us if note is pressed or not and blackNote is mandatory only for notes that have 'sharp/flat'
+        */
       notes: [],
 
       /* It's used to generate notes, used in 'generateNotes' method */
-      allNotes: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+      allNotes: ["C", "D", "E", "F", "G", "A", "B"],
 
       /* As name says */
       whiteNoteWidthSize: 0,
@@ -35788,7 +35815,7 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
     allKeys: {
       type: Array,
       default: function _default() {
-        return ['`', "1", '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.'];
+        return ["`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "z", "x", "c", "v", "b", "n", "m", ",", "."];
       }
     },
     whiteNoteColor: {
@@ -35837,7 +35864,9 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
     /** It is used to highlight keys. Eg. ["C4","E4","G4"] */
     activeKeys: {
       type: Array,
-      default: []
+      default: function _default() {
+        return [];
+      }
     }
   },
   watch: {
@@ -35910,9 +35939,9 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
     };
   },
   destroyed: function destroyed() {
-    window.removeEventListener('keydown', function () {});
-    window.removeEventListener('keyup', function () {});
-    window.removeEventListener('onmouseup', function () {});
+    window.removeEventListener("keydown", function () {});
+    window.removeEventListener("keyup", function () {});
+    window.removeEventListener("onmouseup", function () {});
   },
   computed: {
     scale: function scale() {
@@ -35960,10 +35989,10 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
       this.removePressedKey(noteObject);
     },
     whiteNoteBackground: function whiteNoteBackground(pressed) {
-      return pressed ? this.whiteNoteColor : 'linear-gradient(to bottom, #eee 0%, #fff 100%)';
+      return pressed ? this.whiteNoteColor : "linear-gradient(to bottom, #eee 0%, #fff 100%)";
     },
     blackNoteBackground: function blackNoteBackground(pressed) {
-      return pressed ? this.blackNoteColor : 'linear-gradient(45deg, #555, #222)';
+      return pressed ? this.blackNoteColor : "linear-gradient(45deg, #555, #222)";
     },
     generateNotes: function generateNotes() {
       var keyIndex = 0;
@@ -35982,10 +36011,10 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
 
           if (currentNote !== "B" && currentNote !== "E") {
             var blackNote = {
-              note: currentNote + '#' + octave,
+              note: currentNote + "#" + octave,
               key: this.allKeys[keyIndex++],
               pressed: false,
-              label: this.getLabel(currentNote + '#', octave)
+              label: this.getLabel(currentNote + "#", octave)
             };
             newNote["blackNote"] = blackNote;
           }

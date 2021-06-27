@@ -1,59 +1,76 @@
 <template>
-    <div class="piano-keyboard">
-
-        <div v-for="noteObject in notes" :key="noteObject.note"
-          class="white-note" :class="[noteObject.pressed ? 'white-note-pressed' : '']"
-          :style="{width: whiteNoteWidthSize + '%', background: whiteNoteBackground(noteObject.pressed)}"
-          @mousedown="playNoteMouse(noteObject)" @mouseup="removePressedKeyMouse(noteObject)"
-          @mouseover="playNoteHover(noteObject)" @mouseleave="removePressedKey(noteObject)">
-            
-          <div v-if="noteObject.blackNote"
-            class="black-note" :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']" 
-            :style="{background: blackNoteBackground(noteObject.blackNote.pressed)}"
-            @mousedown.stop="playNoteMouse(noteObject.blackNote)" @mouseup.stop="removePressedKeyMouse(noteObject.blackNote)"
-            @mouseover.stop="playNoteHover(noteObject.blackNote)" @mouseleave.stop="removePressedKey(noteObject.blackNote)">
-
-            <div class="key-group unselectable">
-                <div v-if="showKeys" class="key-input">
-                    {{noteObject.blackNote.key}}
-                </div>
-                 
-                <div v-if="showNotes" :class="['key-text','key-text-on-black-note',indianNotes?'':'key-text-vertical']">
-                    {{noteObject.blackNote.label}}
-                </div>
-            </div>
-          </div> 
-
-          <div class="key-group unselectable"> 
-            <div v-if="showKeys" class="key-input">
-                {{noteObject.key}}
-            </div>
-
-            <div v-if="showNotes" class="key-text">
-                {{noteObject.label}}
-            </div>
+  <div class="piano-keyboard">
+    <div
+      v-for="noteObject in notes"
+      :key="noteObject.note"
+      class="white-note"
+      :class="[noteObject.pressed ? 'white-note-pressed' : '']"
+      :style="{
+        width: whiteNoteWidthSize + '%',
+        background: whiteNoteBackground(noteObject.pressed),
+      }"
+      @mousedown="playNoteMouse(noteObject)"
+      @mouseup="removePressedKeyMouse(noteObject)"
+      @mouseover="playNoteHover(noteObject)"
+      @mouseleave="removePressedKey(noteObject)"
+    >
+      <div
+        v-if="noteObject.blackNote"
+        class="black-note"
+        :class="[noteObject.blackNote.pressed ? 'black-note-pressed' : '']"
+        :style="{
+          background: blackNoteBackground(noteObject.blackNote.pressed),
+        }"
+        @mousedown.stop="playNoteMouse(noteObject.blackNote)"
+        @mouseup.stop="removePressedKeyMouse(noteObject.blackNote)"
+        @mouseover.stop="playNoteHover(noteObject.blackNote)"
+        @mouseleave.stop="removePressedKey(noteObject.blackNote)"
+      >
+        <div class="key-group unselectable">
+          <div v-if="showKeys" class="key-input">
+            {{ noteObject.blackNote.key }}
           </div>
 
+          <div
+            v-if="showNotes"
+            :class="[
+              'key-text',
+              'key-text-on-black-note',
+              indianNotes ? '' : 'key-text-vertical',
+            ]"
+          >
+            {{ noteObject.blackNote.label }}
+          </div>
         </div>
+      </div>
+
+      <div class="key-group unselectable">
+        <div v-if="showKeys" class="key-input">
+          {{ noteObject.key }}
+        </div>
+
+        <div v-if="showNotes" class="key-text">
+          {{ noteObject.label }}
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import * as Tone from "tone";
-import SwaralipiCore from "swaralipi-core"
+import SwaralipiCore from "swaralipi-core";
 
 export default {
-
   data: function () {
     return {
+      /* Tone.js Synth instance which help us to play musical notes */
+      synth: null,
 
-         /* Tone.js Synth instance which help us to play musical notes */
-        synth : null,
+      /* Helper map for pressed key, (e.g notesIndexesByKey['a'] = 4, we found the note which coresponds to 'a' key at index 4 in notes array) */
+      notesIndexesByKey: {},
 
-        /* Helper map for pressed key, (e.g notesIndexesByKey['a'] = 4, we found the note which coresponds to 'a' key at index 4 in notes array) */
-        notesIndexesByKey: {},
-
-        /* Array with generated notes of the form 
+      /* Array with generated notes of the form 
             { 
                 note: <C4>,
                 key: <a>,
@@ -67,289 +84,349 @@ export default {
             where note is the note name, key is a keyboard key you have to press in order to play that note,
             pressed is telling us if note is pressed or not and blackNote is mandatory only for notes that have 'sharp/flat'
         */
-        notes : [],
+      notes: [],
 
-        /* It's used to generate notes, used in 'generateNotes' method */
-        allNotes: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+      /* It's used to generate notes, used in 'generateNotes' method */
+      allNotes: ["C", "D", "E", "F", "G", "A", "B"],
 
-        /* As name says */
-        whiteNoteWidthSize: 0,
+      /* As name says */
+      whiteNoteWidthSize: 0,
 
-        /* It's used to play note when mouse is pressed and note is hovered */
-        isMousePressed: false,
+      /* It's used to play note when mouse is pressed and note is hovered */
+      isMousePressed: false,
 
-        /* Swaralipi (Indian Sheet Music) Library Object */
-        swaralipi: null
+      /* Swaralipi (Indian Sheet Music) Library Object */
+      swaralipi: null,
     };
   },
 
   props: {
-
-    allKeys:{
-        type: Array,
-        default: () => [
-            '`', `1`, '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=',
-            'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\',
-            'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',
-            'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.' 
-        ]
+    allKeys: {
+      type: Array,
+      default: () => [
+        "`",
+        `1`,
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "0",
+        "-",
+        "=",
+        "q",
+        "w",
+        "e",
+        "r",
+        "t",
+        "y",
+        "u",
+        "i",
+        "o",
+        "p",
+        "[",
+        "]",
+        "\\",
+        "a",
+        "s",
+        "d",
+        "f",
+        "g",
+        "h",
+        "j",
+        "k",
+        "l",
+        ";",
+        "z",
+        "x",
+        "c",
+        "v",
+        "b",
+        "n",
+        "m",
+        ",",
+        ".",
+      ],
     },
 
     whiteNoteColor: {
-        type: String,
-        default: "#1eb7eb"
+      type: String,
+      default: "#1eb7eb",
     },
 
     blackNoteColor: {
-        type: String,
-        default: "#f9bb2d"
+      type: String,
+      default: "#f9bb2d",
     },
 
     showKeys: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
 
     showNotes: {
-        type:Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
 
     startOctave: {
-        type: Number,
-        default: 2
+      type: Number,
+      default: 2,
     },
 
     endOctave: {
-        type: Number,
-        default: 4
+      type: Number,
+      default: 4,
     },
 
     sustain: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
 
-    indianNotes:{
-        type: Boolean,
-        default: false
+    indianNotes: {
+      type: Boolean,
+      default: false,
     },
 
-    noteConfig:{
-        type: Object,        
-        default: function () {
-          return {
-            scale: "C",
-            middleOctave: 4,
-            lang: "hi"
-          }
-        },
-    },  
-    
+    noteConfig: {
+      type: Object,
+      default: function () {
+        return {
+          scale: "C",
+          middleOctave: 4,
+          lang: "hi",
+        };
+      },
+    },
+
     /** It is used to highlight keys. Eg. ["C4","E4","G4"] */
-    activeKeys:{
+    activeKeys: {
       type: Array,
-      default: []
-    }
+      default: () => [],
+    },
   },
 
   watch: {
-    startOctave(val){
+    startOctave(val) {
       this.startOctave = val;
       this.regenerate();
     },
-    endOctave(val){
+    endOctave(val) {
       this.endOctave = val;
       this.regenerate();
     },
-    allKeys(val){
+    allKeys(val) {
       this.allKeys = val;
       this.regenerate();
     },
-    indianNotes(val){
+    indianNotes(val) {
       this.indianNotes = val;
       this.regenerate();
     },
-    scale(val){      
+    scale(val) {
       this.noteConfig.scale = val;
       this.regenerate();
     },
-    middleOctave(val){      
+    middleOctave(val) {
       this.noteConfig.middleOctave = val;
       this.regenerate();
     },
-    lang(val){      
+    lang(val) {
       this.noteConfig.lang = val;
       this.regenerate();
     },
-    activeKeys:{
-      handler(keys){
-       this.changeActiveKeys(keys)
+    activeKeys: {
+      handler(keys) {
+        this.changeActiveKeys(keys);
       },
       deep: true,
-      immediate: true
-    }
+      immediate: true,
+    },
   },
 
   created() {
     this.synth = new Tone.Synth().toDestination();
-    this.swaralipi = new SwaralipiCore(this.scale, this.middleOctave, this.lang)
+    this.swaralipi = new SwaralipiCore(
+      this.scale,
+      this.middleOctave,
+      this.lang
+    );
     this.generateNotes();
     this.generateNotesIndexesByKey();
 
-    window.addEventListener("keydown", e => {
+    window.addEventListener("keydown", (e) => {
       const key = e.key;
       const index = this.notesIndexesByKey[key];
 
-      if(index != undefined){
-        const noteObject = this.notes[index].key === key ? this.notes[index] : this.notes[index].blackNote;
+      if (index != undefined) {
+        const noteObject =
+          this.notes[index].key === key
+            ? this.notes[index]
+            : this.notes[index].blackNote;
         this.playNote(noteObject);
       }
     });
 
-    window.addEventListener("keyup", e => {
+    window.addEventListener("keyup", (e) => {
       const key = e.key;
       const index = this.notesIndexesByKey[key];
 
-      if(index != undefined){
-        const noteObject = this.notes[index].key === key ? this.notes[index] : this.notes[index].blackNote;
+      if (index != undefined) {
+        const noteObject =
+          this.notes[index].key === key
+            ? this.notes[index]
+            : this.notes[index].blackNote;
         this.removePressedKey(noteObject);
       }
     });
 
     window.onmouseup = () => {
-       this.isMousePressed = false;
-    }
+      this.isMousePressed = false;
+    };
   },
 
   destroyed() {
-    window.removeEventListener('keydown', () => {});
-    window.removeEventListener('keyup', () => {});
-    window.removeEventListener('onmouseup', () => {});
+    window.removeEventListener("keydown", () => {});
+    window.removeEventListener("keyup", () => {});
+    window.removeEventListener("onmouseup", () => {});
   },
 
   computed: {
     scale() {
       return this.noteConfig.scale;
     },
-    lang(){
+    lang() {
       return this.noteConfig.lang;
     },
-    middleOctave(){
+    middleOctave() {
       return this.noteConfig.middleOctave;
-    }
+    },
   },
 
   methods: {
     playNote(noteObject) {
-        /** Emits noteObject, it can be used to add a listener to the note outside of the component */
-        this.$emit("click", noteObject);
-        if(!noteObject.pressed){
-            this.synth.triggerAttackRelease(noteObject.note, this.sustain ? "2n" : "8n");
-            noteObject.pressed = true;
-        }
+      /** Emits noteObject, it can be used to add a listener to the note outside of the component */
+      this.$emit("click", noteObject);
+      if (!noteObject.pressed) {
+        this.synth.triggerAttackRelease(
+          noteObject.note,
+          this.sustain ? "2n" : "8n"
+        );
+        noteObject.pressed = true;
+      }
     },
 
-    changeActiveKeys(activeKeys){
-      console.log("activeKeyschanged: ",activeKeys)
-      this.notes.forEach(nodeObj => {  
-          if(activeKeys.includes(nodeObj.note)){
-            nodeObj.pressed = true;
-          }else{
-            nodeObj.pressed = false;
-          }
-      });      
+    changeActiveKeys(activeKeys) {
+      console.log("activeKeyschanged: ", activeKeys);
+      this.notes.forEach((nodeObj) => {
+        if (activeKeys.includes(nodeObj.note)) {
+          nodeObj.pressed = true;
+        } else {
+          nodeObj.pressed = false;
+        }
+      });
     },
 
     playNoteMouse(noteObject) {
-        this.isMousePressed = true;
-        this.playNote(noteObject);
+      this.isMousePressed = true;
+      this.playNote(noteObject);
     },
 
     playNoteHover(noteObject) {
-        if(this.isMousePressed)
-            this.playNote(noteObject);
+      if (this.isMousePressed) this.playNote(noteObject);
     },
 
     removePressedKey(noteObject) {
-        noteObject.pressed = false;
+      noteObject.pressed = false;
     },
 
     removePressedKeyMouse(noteObject) {
-        this.isMousePressed = false
-        this.removePressedKey(noteObject);
+      this.isMousePressed = false;
+      this.removePressedKey(noteObject);
     },
 
-    whiteNoteBackground: function(pressed){
-      return pressed ? this.whiteNoteColor : 'linear-gradient(to bottom, #eee 0%, #fff 100%)';
-    },
-    
-    blackNoteBackground: function(pressed){
-      return pressed ? this.blackNoteColor : 'linear-gradient(45deg, #555, #222)';
+    whiteNoteBackground: function (pressed) {
+      return pressed
+        ? this.whiteNoteColor
+        : "linear-gradient(to bottom, #eee 0%, #fff 100%)";
     },
 
-    generateNotes: function(){
-        let keyIndex = 0;
-        let noteIndex = 0;
-        this.notes.length = 0;
-        for(let octave = this.startOctave; octave <= this.endOctave; octave++) {
+    blackNoteBackground: function (pressed) {
+      return pressed
+        ? this.blackNoteColor
+        : "linear-gradient(45deg, #555, #222)";
+    },
 
-            while(noteIndex < this.allNotes.length) {
-                const currentNote = this.allNotes[noteIndex];
+    generateNotes: function () {
+      let keyIndex = 0;
+      let noteIndex = 0;
+      this.notes.length = 0;
+      for (let octave = this.startOctave; octave <= this.endOctave; octave++) {
+        while (noteIndex < this.allNotes.length) {
+          const currentNote = this.allNotes[noteIndex];
 
-                let newNote = {
-                    note: currentNote + octave,
-                    key: this.allKeys[keyIndex++],
-                    pressed: false,
-                    label: this.getLabel(currentNote, octave)
-                }
+          let newNote = {
+            note: currentNote + octave,
+            key: this.allKeys[keyIndex++],
+            pressed: false,
+            label: this.getLabel(currentNote, octave),
+          };
 
-                if(currentNote !== "B" && currentNote !== "E") {
-                    let blackNote = {
-                        note: currentNote + '#' + octave,
-                        key: this.allKeys[keyIndex++],
-                        pressed: false,
-                        label: this.getLabel(currentNote+'#', octave)
-                    }
+          if (currentNote !== "B" && currentNote !== "E") {
+            let blackNote = {
+              note: currentNote + "#" + octave,
+              key: this.allKeys[keyIndex++],
+              pressed: false,
+              label: this.getLabel(currentNote + "#", octave),
+            };
 
-                    newNote["blackNote"] = blackNote;
-                }
+            newNote["blackNote"] = blackNote;
+          }
 
-                this.notes.push(newNote);
-                
-                if(octave === this.endOctave && currentNote === "B")
-                    break;
-                
-                noteIndex++;
-            }
+          this.notes.push(newNote);
 
-            noteIndex = 0;
+          if (octave === this.endOctave && currentNote === "B") break;
+
+          noteIndex++;
         }
 
-        this.whiteNoteWidthSize = 100 / this.notes.length;
+        noteIndex = 0;
+      }
+
+      this.whiteNoteWidthSize = 100 / this.notes.length;
     },
 
-    generateNotesIndexesByKey: function() {
-        this.notesIndexesByKey = {}
-        for(let index = 0; index < this.notes.length; index++){
-            this.notesIndexesByKey[this.notes[index].key] = index;
+    generateNotesIndexesByKey: function () {
+      this.notesIndexesByKey = {};
+      for (let index = 0; index < this.notes.length; index++) {
+        this.notesIndexesByKey[this.notes[index].key] = index;
 
-            if(this.notes[index].blackNote != undefined)
-                this.notesIndexesByKey[this.notes[index].blackNote.key] = index;
-        }
+        if (this.notes[index].blackNote != undefined)
+          this.notesIndexesByKey[this.notes[index].blackNote.key] = index;
+      }
     },
 
-    regenerate: function() {
-      this.swaralipi = new SwaralipiCore(this.scale, this.middleOctave, this.lang)
+    regenerate: function () {
+      this.swaralipi = new SwaralipiCore(
+        this.scale,
+        this.middleOctave,
+        this.lang
+      );
       this.generateNotes();
       this.generateNotesIndexesByKey();
     },
 
-    getLabel: function(note, octave){      
-      return this.indianNotes? this.swaralipi.toIndianNote(note+octave): note;
-    }
+    getLabel: function (note, octave) {
+      return this.indianNotes
+        ? this.swaralipi.toIndianNote(note + octave)
+        : note;
+    },
   },
-}
+};
 </script>
 
 <style>
@@ -358,7 +435,7 @@ export default {
   height: 100%;
   width: 100%;
 }
- 
+
 .white-note {
   display: flex;
   justify-content: center;
@@ -368,19 +445,15 @@ export default {
   color: black;
   height: 98%;
   border-radius: 0 0 5px 5px;
-  box-shadow: 
-    0px 0px 0px rgba(255, 255, 255, 0.8) inset,
-    -2px -5px 3px #ccc inset,
-    0 0 3px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 0px rgba(255, 255, 255, 0.8) inset,
+    -2px -5px 3px #ccc inset, 0 0 3px rgba(0, 0, 0, 0.5);
 }
- 
+
 .white-note-pressed {
-  box-shadow: 
-     2px 0 3px rgba(0, 0, 0, 0.2) inset,
-    -5px -1px 20px rgba(0, 0, 0, 0.2) inset,
-     0 0 3px rgba(0, 0, 0, 0.5); 
+  box-shadow: 2px 0 3px rgba(0, 0, 0, 0.2) inset,
+    -5px -1px 20px rgba(0, 0, 0, 0.2) inset, 0 0 3px rgba(0, 0, 0, 0.5);
 }
- 
+
 .black-note {
   display: flex;
   align-items: flex-end;
@@ -393,19 +466,15 @@ export default {
   z-index: 1;
   color: white;
   border-radius: 0 0 3px 3px;
-  box-shadow: 
-    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
-    0 -5px 2px  rgba(0, 0, 0, 0.5) inset,
-    0 2px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -5px 2px rgba(0, 0, 0, 0.5) inset, 0 2px 4px rgba(0, 0, 0, 0.5);
 }
- 
+
 .black-note-pressed {
-  box-shadow: 
-    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
-    0 -1px 2px rgba(0, 0, 0, 0.2) inset,
-    0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.2);
 }
- 
+
 .key-group {
   align-self: flex-end;
   display: flex;
@@ -414,33 +483,33 @@ export default {
   margin-bottom: 0.8vw;
   font-size: 1.2vw;
 }
- 
+
 .key-text {
   margin-top: 0.8vw;
 }
- 
-.key-text-on-black-note { 
+
+.key-text-on-black-note {
   margin: 0.8vw 0;
   margin-top: 1vw;
 }
 
 .key-text-vertical {
-   transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
- 
+
 .key-input {
   text-align: center;
   width: 2em;
   color: inherit;
   font-size: 1vw;
 }
- 
+
 .unselectable {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
