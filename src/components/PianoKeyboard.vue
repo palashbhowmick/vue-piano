@@ -144,6 +144,12 @@ export default {
             lang: "hi"
           }
         },
+    },  
+    
+    /** It is used to highlight keys. Eg. ["C4","E4","G4"] */
+    activeKeys:{
+      type: Array,
+      default: []
     }
   },
 
@@ -175,6 +181,13 @@ export default {
     lang(val){      
       this.noteConfig.lang = val;
       this.regenerate();
+    },
+    activeKeys:{
+      handler(keys){
+       this.changeActiveKeys(keys)
+      },
+      deep: true,
+      immediate: true
     }
   },
 
@@ -229,10 +242,23 @@ export default {
 
   methods: {
     playNote(noteObject) {
+        /** Emits noteObject, it can be used to add a listener to the note outside of the component */
+        this.$emit("click", noteObject);
         if(!noteObject.pressed){
             this.synth.triggerAttackRelease(noteObject.note, this.sustain ? "2n" : "8n");
             noteObject.pressed = true;
         }
+    },
+
+    changeActiveKeys(activeKeys){
+      console.log("activeKeyschanged: ",activeKeys)
+      this.notes.forEach(nodeObj => {  
+          if(activeKeys.includes(nodeObj.note)){
+            nodeObj.pressed = true;
+          }else{
+            nodeObj.pressed = false;
+          }
+      });      
     },
 
     playNoteMouse(noteObject) {
