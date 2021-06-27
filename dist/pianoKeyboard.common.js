@@ -574,6 +574,49 @@ module.exports = !DESCRIPTORS && !fails(function () {
 
 /***/ }),
 
+/***/ "159b":
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__("da84");
+var DOMIterables = __webpack_require__("fdbc");
+var forEach = __webpack_require__("17c2");
+var createNonEnumerableProperty = __webpack_require__("9112");
+
+for (var COLLECTION_NAME in DOMIterables) {
+  var Collection = global[COLLECTION_NAME];
+  var CollectionPrototype = Collection && Collection.prototype;
+  // some Chrome versions have non-configurable methods on DOMTokenList
+  if (CollectionPrototype && CollectionPrototype.forEach !== forEach) try {
+    createNonEnumerableProperty(CollectionPrototype, 'forEach', forEach);
+  } catch (error) {
+    CollectionPrototype.forEach = forEach;
+  }
+}
+
+
+/***/ }),
+
+/***/ "17c2":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $forEach = __webpack_require__("b727").forEach;
+var arrayMethodIsStrict = __webpack_require__("a640");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var STRICT_METHOD = arrayMethodIsStrict('forEach');
+var USES_TO_LENGTH = arrayMethodUsesToLength('forEach');
+
+// `Array.prototype.forEach` method implementation
+// https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+module.exports = (!STRICT_METHOD || !USES_TO_LENGTH) ? function forEach(callbackfn /* , thisArg */) {
+  return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+} : [].forEach;
+
+
+/***/ }),
+
 /***/ "1be4":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -878,6 +921,28 @@ function toComment(sourceMap) {
 
 /***/ }),
 
+/***/ "2532":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var notARegExp = __webpack_require__("5a34");
+var requireObjectCoercible = __webpack_require__("1d80");
+var correctIsRegExpLogic = __webpack_require__("ab13");
+
+// `String.prototype.includes` method
+// https://tc39.github.io/ecma262/#sec-string.prototype.includes
+$({ target: 'String', proto: true, forced: !correctIsRegExpLogic('includes') }, {
+  includes: function includes(searchString /* , position = 0 */) {
+    return !!~String(requireObjectCoercible(this))
+      .indexOf(notARegExp(searchString), arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+
 /***/ "25f0":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1067,6 +1132,23 @@ module.exports = {};
 
 /***/ }),
 
+/***/ "4160":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var forEach = __webpack_require__("17c2");
+
+// `Array.prototype.forEach` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+$({ target: 'Array', proto: true, forced: [].forEach != forEach }, {
+  forEach: forEach
+});
+
+
+/***/ }),
+
 /***/ "428f":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1119,6 +1201,25 @@ if (ArrayPrototype[UNSCOPABLES] == undefined) {
 // add a key to Array.prototype[@@unscopables]
 module.exports = function (key) {
   ArrayPrototype[UNSCOPABLES][key] = true;
+};
+
+
+/***/ }),
+
+/***/ "44e7":
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__("861d");
+var classof = __webpack_require__("c6b6");
+var wellKnownSymbol = __webpack_require__("b622");
+
+var MATCH = wellKnownSymbol('match');
+
+// `IsRegExp` abstract operation
+// https://tc39.github.io/ecma262/#sec-isregexp
+module.exports = function (it) {
+  var isRegExp;
+  return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classof(it) == 'RegExp');
 };
 
 
@@ -1595,6 +1696,20 @@ module.exports = {
   // `String.prototype.trim` method
   // https://tc39.github.io/ecma262/#sec-string.prototype.trim
   trim: createMethod(3)
+};
+
+
+/***/ }),
+
+/***/ "5a34":
+/***/ (function(module, exports, __webpack_require__) {
+
+var isRegExp = __webpack_require__("44e7");
+
+module.exports = function (it) {
+  if (isRegExp(it)) {
+    throw TypeError("The method doesn't accept regular expressions");
+  } return it;
 };
 
 
@@ -2968,6 +3083,24 @@ $({ target: 'Array', stat: true, forced: INCORRECT_ITERATION }, {
 
 /***/ }),
 
+/***/ "a640":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var fails = __webpack_require__("d039");
+
+module.exports = function (METHOD_NAME, argument) {
+  var method = [][METHOD_NAME];
+  return !!method && fails(function () {
+    // eslint-disable-next-line no-useless-call,no-throw-literal
+    method.call(null, argument || function () { throw 1; }, 1);
+  });
+};
+
+
+/***/ }),
+
 /***/ "a691":
 /***/ (function(module, exports) {
 
@@ -3065,6 +3198,28 @@ if (isForced(NUMBER, !NativeNumber(' 0o1') || !NativeNumber('0b1') || NativeNumb
   NumberPrototype.constructor = NumberWrapper;
   redefine(global, NUMBER, NumberWrapper);
 }
+
+
+/***/ }),
+
+/***/ "ab13":
+/***/ (function(module, exports, __webpack_require__) {
+
+var wellKnownSymbol = __webpack_require__("b622");
+
+var MATCH = wellKnownSymbol('match');
+
+module.exports = function (METHOD_NAME) {
+  var regexp = /./;
+  try {
+    '/./'[METHOD_NAME](regexp);
+  } catch (e) {
+    try {
+      regexp[MATCH] = false;
+      return '/./'[METHOD_NAME](regexp);
+    } catch (f) { /* empty */ }
+  } return false;
+};
 
 
 /***/ }),
@@ -3453,6 +3608,32 @@ module.exports = function (object, names) {
   }
   return result;
 };
+
+
+/***/ }),
+
+/***/ "caad":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var $includes = __webpack_require__("4d64").includes;
+var addToUnscopables = __webpack_require__("44d2");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var USES_TO_LENGTH = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
+
+// `Array.prototype.includes` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.includes
+$({ target: 'Array', proto: true, forced: !USES_TO_LENGTH }, {
+  includes: function includes(el /* , fromIndex = 0 */) {
+    return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables('includes');
 
 
 /***/ }),
@@ -4011,15 +4192,27 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0a498af2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/PianoKeyboard.vue?vue&type=template&id=ba3fa062&
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"0a498af2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/PianoKeyboard.vue?vue&type=template&id=ae94e940&
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"piano-keyboard"},_vm._l((_vm.notes),function(noteObject){return _c('div',{key:noteObject.note,staticClass:"white-note",class:[noteObject.pressed ? 'white-note-pressed' : ''],style:({width: _vm.whiteNoteWidthSize + '%', background: _vm.whiteNoteBackground(noteObject.pressed)}),on:{"mousedown":function($event){return _vm.playNoteMouse(noteObject)},"mouseup":function($event){return _vm.removePressedKeyMouse(noteObject)},"mouseover":function($event){return _vm.playNoteHover(noteObject)},"mouseleave":function($event){return _vm.removePressedKey(noteObject)}}},[(noteObject.blackNote)?_c('div',{staticClass:"black-note",class:[noteObject.blackNote.pressed ? 'black-note-pressed' : ''],style:({background: _vm.blackNoteBackground(noteObject.blackNote.pressed)}),on:{"mousedown":function($event){$event.stopPropagation();return _vm.playNoteMouse(noteObject.blackNote)},"mouseup":function($event){$event.stopPropagation();return _vm.removePressedKeyMouse(noteObject.blackNote)},"mouseover":function($event){$event.stopPropagation();return _vm.playNoteHover(noteObject.blackNote)},"mouseleave":function($event){$event.stopPropagation();return _vm.removePressedKey(noteObject.blackNote)}}},[_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.blackNote.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{class:['key-text','key-text-on-black-note',_vm.indianNotes?'':'key-text-vertical']},[_vm._v(" "+_vm._s(noteObject.blackNote.label)+" ")]):_vm._e()])]):_vm._e(),_c('div',{staticClass:"key-group unselectable"},[(_vm.showKeys)?_c('div',{staticClass:"key-input"},[_vm._v(" "+_vm._s(noteObject.key)+" ")]):_vm._e(),(_vm.showNotes)?_c('div',{staticClass:"key-text"},[_vm._v(" "+_vm._s(noteObject.label)+" ")]):_vm._e()])])}),0)}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/components/PianoKeyboard.vue?vue&type=template&id=ba3fa062&
+// CONCATENATED MODULE: ./src/components/PianoKeyboard.vue?vue&type=template&id=ae94e940&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.for-each.js
+var es_array_for_each = __webpack_require__("4160");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.includes.js
+var es_array_includes = __webpack_require__("caad");
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
 var es_number_constructor = __webpack_require__("a9e3");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.includes.js
+var es_string_includes = __webpack_require__("2532");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-collections.for-each.js
+var web_dom_collections_for_each = __webpack_require__("159b");
 
 // CONCATENATED MODULE: ./node_modules/tone/build/esm/version.js
 const version = "14.7.58";
@@ -35498,6 +35691,10 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
 
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/PianoKeyboard.vue?vue&type=script&lang=js&
 
+
+
+
+
 //
 //
 //
@@ -35626,6 +35823,12 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
           lang: "hi"
         };
       }
+    },
+
+    /** It is used to highlight keys. Eg. ["C4","E4","G4"] */
+    activeKeys: {
+      type: Array,
+      default: []
     }
   },
   watch: {
@@ -35656,6 +35859,13 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
     lang: function lang(val) {
       this.noteConfig.lang = val;
       this.regenerate();
+    },
+    activeKeys: {
+      handler: function handler(keys) {
+        this.changeActiveKeys(keys);
+      },
+      deep: true,
+      immediate: true
     }
   },
   created: function created() {
@@ -35708,10 +35918,23 @@ var src_default = /*#__PURE__*/__webpack_require__.n(swaralipi_core_src);
   },
   methods: {
     playNote: function playNote(noteObject) {
+      /** Emits noteObject, it can be used to add a listener to the note outside of the component */
+      this.$emit("click", noteObject);
+
       if (!noteObject.pressed) {
         this.synth.triggerAttackRelease(noteObject.note, this.sustain ? "2n" : "8n");
         noteObject.pressed = true;
       }
+    },
+    changeActiveKeys: function changeActiveKeys(activeKeys) {
+      console.log("activeKeyschanged: ", activeKeys);
+      this.notes.forEach(function (nodeObj) {
+        if (activeKeys.includes(nodeObj.note)) {
+          nodeObj.pressed = true;
+        } else {
+          nodeObj.pressed = false;
+        }
+      });
     },
     playNoteMouse: function playNoteMouse(noteObject) {
       this.isMousePressed = true;
